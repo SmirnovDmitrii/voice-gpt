@@ -5,7 +5,7 @@ import { OpenAi } from "./openai.js";
 const openAi = OpenAi(OPENAI_KEY);
 
 export const createContext = async (ctx) => {
-  ctx.session = context;
+  ctx.session = { messages: [] };
   await ctx.reply("Отправьте сообщение");
 };
 
