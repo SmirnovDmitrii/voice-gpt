@@ -1,8 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 
-export const OpenAi = (key) => {
-  const config = new Configuration({
-    apiKey: key,
-  });
+export const OpenAi = (apiKey) => {
+  const config = new Configuration({ apiKey });
   return new OpenAIApi(config);
 };

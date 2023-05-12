@@ -1,26 +1,15 @@
 import { Telegraf } from "telegraf";
 import { message } from "telegraf/filters";
-import { OpenAi } from "./openai.js";
 
-const bot = new Telegraf($TELEGRAM_TOKEN);
-const openAi = OpenAi($OPENAI_KEY);
+import { TELEGRAM_TOKEN } from "./constants.js";
+import { createContext, sendTextHandler, sendVoiceHandler } from "./handlers.js";
 
-bot.on(message("text"), async (ctx) => {
-  await ctx.reply(JSON.stringify(ctx.message.text, null, 2));
-  const response = await openAi.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages: [{role: 'user', content: ctx.message.text}]
-  });
-  await ctx.reply(response.data.choices[0].message.content)
-});
+const bot = new Telegraf(TELEGRAM_TOKEN);
 
-bot.on(message("voice"), async (ctx) => {
-  // await ctx.reply(JSON.stringify(ctx.message));
-});
-
-bot.command("start", async (ctx) => {
-  // await ctx.reply("ой все");
-});
+bot.command("start", async (ctx) => createContext(ctx));
+bot.command("new", async (ctx) => createContext(ctx));
+bot.on(message("text"), async (ctx) => sendTextHandler(ctx));
+bot.on(message("voice"), async (ctx) => sendVoiceHandler(ctx));
 
 bot.launch();
 
