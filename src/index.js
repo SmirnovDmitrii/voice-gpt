@@ -1,10 +1,12 @@
-import { Telegraf } from "telegraf";
+import { Telegraf, session } from "telegraf";
 import { message } from "telegraf/filters";
 
 import { TELEGRAM_TOKEN } from "./constants.js";
 import { createContext, sendTextHandler, sendVoiceHandler } from "./handlers.js";
 
 const bot = new Telegraf(TELEGRAM_TOKEN);
+
+bot.use(session());
 
 bot.command("start", async (ctx) => createContext(ctx));
 bot.command("new", async (ctx) => createContext(ctx));

@@ -4,5 +4,6 @@ export const MODEL = process.env.MODEL;
 export const context = { messages: [] };
 export const ROLE = {
   USER: "user",
-  GPT: "gpt",
+  ASSISTANT: "assistant",
+  SYSTEM: "system",
 };
