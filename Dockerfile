@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 
-WORKDIR /var/www/app/voice-gpt
+WORKDIR /.
 
 COPY package.json .
 COPY yarn.lock .
