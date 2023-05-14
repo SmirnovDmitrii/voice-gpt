@@ -45,8 +45,8 @@ export const sendVoiceHandler = async (ctx) => {
     ctx.session.messages.push({ role: ROLE.ASSISTANT, content });
     await ctx.reply(content);
 
-    unlink(oggPath, (e) => console.log("catch unlink ogg", e));
-    unlink(mp3Path, (e) => console.log("catch unlink mp3", e));
+    // await unlink(oggPath, (e) => console.log("catch unlink ogg", e));
+    // await unlink(mp3Path, (e) => console.log("catch unlink mp3", e));
   } catch (e) {
     console.log("catch sendVoiceHandler", e);
   }
