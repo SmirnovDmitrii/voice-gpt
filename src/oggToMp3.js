@@ -11,8 +11,12 @@ ffmpeg.setFfmpegPath(installer.path);
 export const toMp3 = async (url, name) => {
   try {
     const outputPath = resolve(dirname(url), `voice${name}.mp3`);
-    await ffmpeg(url).output(outputPath).run();
-    return outputPath;
+    return new Promise((resolve) => {
+      ffmpeg(url)
+        .output(outputPath)
+        .on("end", () => resolve(outputPath))
+        .run();
+    });
   } catch (e) {
     console.log("Error toMp3", e.message);
   }
@@ -22,9 +26,11 @@ export const urlToOgg = async (url, name) => {
   try {
     const oggPath = resolve(__dirname, "../voices", `voice${name}.ogg`);
     const response = await axios({ method: "get", url, responseType: "stream" });
-    const stream = response.data.pipe(createWriteStream(oggPath));
-    await stream.finished;
-    return oggPath;
+    return new Promise((resolve) => {
+      const stream = createWriteStream(oggPath);
+      response.data.pipe(stream);
+      stream.on("finish", () => resolve(oggPath));
+    });
   } catch (e) {
     console.log("Error urlToOgg", e.message);
   }
