@@ -1,15 +1,21 @@
 import { code } from "telegraf/format";
 import { createReadStream, unlink } from "fs";
 
-import { context, MODEL, OPENAI_KEY, ROLE } from "./constants.js";
+import { context, englishStartMessage, MODEL, OPENAI_KEY, ROLE } from "./constants.js";
 import { OpenAi } from "./openai.js";
 import { toMp3, urlToOgg } from "./oggToMp3.js";
+import { texToSpeech } from "./tts.js";
 
 const openAi = OpenAi(OPENAI_KEY);
 
 export const createContext = async (ctx) => {
   ctx.session = { messages: [] };
   await ctx.reply("Отправьте сообщение");
+};
+
+export const createSpeechContext = async (ctx) => {
+  ctx.session = { messages: [{ role: ROLE.USER, content: englishStartMessage }] };
+  await ctx.reply("choose a topic for conversation");
 };
 
 export const sendTextHandler = async (ctx) => {
@@ -28,7 +34,7 @@ export const sendTextHandler = async (ctx) => {
   }
 };
 
-export const sendVoiceHandler = async (ctx) => {
+export const sendVoiceHandler = async (ctx, useTTS) => {
   await ctx.reply(code("Жду ответ от openAi..."));
   try {
     const { href } = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
@@ -43,7 +49,12 @@ export const sendVoiceHandler = async (ctx) => {
     const response = await openAi.createChatCompletion({ model: MODEL, messages: ctx.session.messages });
     const content = response.data.choices[0].message.content;
     ctx.session.messages.push({ role: ROLE.ASSISTANT, content });
-    await ctx.reply(content);
+
+    if (!useTTS) await ctx.reply(content);
+    if (useTTS) {
+      const speech = await texToSpeech({ text: content });
+      await ctx.reply(speech);
+    }
 
     // await unlink(oggPath, (e) => console.log("catch unlink ogg", e));
     // await unlink(mp3Path, (e) => console.log("catch unlink mp3", e));
